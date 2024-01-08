@@ -1,0 +1,76 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div class="container mx-auto">
+    <h1 class="text-3xl font-bold underline" id="welcome">
+      Hello, 
+    </h1>
+    <br>
+    Pemilik: <div id="pemilik"></div>
+    rawText: <div id="rawText"></div>
+    angka: <div id="angka"></div>
+    <hr>
+    <br>
+    <button onclick="loadData()" class="px-6 py-2 text-sm transition-colors duration-300 border-2 rounded-full shadow-xl text-cyan-500 border-cyan-400 shadow-cyan-300/30 hover:bg-cyan-500 hover:text-cyan-100"> loadData </button>
+    <br>
+    <input type="text" id="textRaw" placeholder="Text Raw"><br>
+    <button onclick="setText()" class="px-6 py-2 text-sm transition-colors duration-300 border-2 rounded-full shadow-xl text-cyan-500 border-cyan-400 shadow-cyan-300/30 hover:bg-cyan-500 hover:text-cyan-100"> set Text </button>
+    <button onclick="inc()" class="px-6 py-2 text-sm transition-colors duration-300 border-2 rounded-full shadow-xl text-cyan-500 border-cyan-400 shadow-cyan-300/30 hover:bg-cyan-500 hover:text-cyan-100"> Increment </button>
+    <div id="wallet">
+
+        <button class="px-6 py-2 text-sm transition-colors duration-300 border-2 rounded-full shadow-xl text-cyan-500 border-cyan-400 shadow-cyan-300/30 hover:bg-cyan-500 hover:text-cyan-100"
+        onclick="connect()">
+            connect wallet
+        </button>
+    </div>
+
+  </div>
+</body>
+<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+<script src="abi.js"></script>
+<script>
+
+  let provider;
+
+  let account;
+  let storeContract;
+
+  async function loadData() {
+    document.getElementById("pemilik").innerText = await storeContract.getPemilik()
+    document.getElementById("rawText").innerText = await storeContract.textRaw()
+    document.getElementById("angka").innerText = await storeContract.angka()
+}
+
+async function setText() {
+    const textValue = document.getElementById("textRaw").value
+    const store = storeContract.connect(await provider.getSigner())
+    await store.setText(textValue)
+    await loadData()
+}
+
+async function inc() {
+    const store = storeContract.connect(await provider.getSigner())
+    await store.inc()
+    await loadData()
+}
+
+  async function connect(){
+    await ethereum.request({ method: 'eth_requestAccounts' });
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    account = await provider.getSigner().getAddress()
+    document.getElementById("welcome").innerText += account
+    document.getElementById("wallet").classList.add("invisible");
+    storeContract = new ethers.Contract("0x2144585e855E6ad9Ec5FC3DdB41EF547eAaBbF02", abi, provider)
+    await loadData()
+  }
+ 
+  window.addEventListener('load', async () => {
+
+
+  })
+</script>
+</html>
